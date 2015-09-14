@@ -221,7 +221,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
     }
 
     @Override
-    protected void onPlusClientSignIn() {
+    protected void onGoogleApiClientSignIn() {
         //Set up sign out and disconnect buttons.
         Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
         signOutButton.setOnClickListener(new OnClickListener() {
@@ -239,15 +239,16 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         });
     }
 
+
     @Override
-    protected void onPlusClientBlockingUI(boolean show) {
+    protected void onGoogleApiClientBlockingUI(boolean show) {
         showProgress(show);
     }
 
     @Override
     protected void updateConnectButtonState() {
         //TODO: Update this logic to also handle the user logged in by email.
-        boolean connected = getPlusClient().isConnected();
+        boolean connected = getGoogleApiClient().isConnected();
 
         mSignOutButtons.setVisibility(connected ? View.VISIBLE : View.GONE);
         mPlusSignInButton.setVisibility(connected ? View.GONE : View.VISIBLE);
@@ -255,13 +256,13 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
     }
 
     @Override
-    protected void onPlusClientRevokeAccess() {
+    protected void onGoogleApiClientRevokeAccess() {
         // TODO: Access to the user's G+ account has been revoked.  Per the developer terms, delete
         // any stored user data here.
     }
 
     @Override
-    protected void onPlusClientSignOut() {
+    protected void onGoogleApiClientSignOut() {
 
     }
 
@@ -307,6 +308,11 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
 
     }
 
