@@ -16,6 +16,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.JsonReader;
+import android.util.JsonWriter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,8 +33,35 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 
 /**
@@ -168,8 +198,16 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            InputStream is = null;
+            try {
+                //is = new BufferedInputStream(new FileInputStream("tomcat.crt"));
+                is = this.getResources().openRawResource(R.raw.tomcat);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, is);
             mAuthTask.execute((Void) null);
         }
     }
@@ -344,10 +382,12 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
 
         private final String mEmail;
         private final String mPassword;
+        private InputStream mIn = null;
 
-        UserLoginTask(String email, String password) {
+        UserLoginTask(String email, String password, InputStream in) {
             mEmail = email;
             mPassword = password;
+            mIn = in;
         }
 
         @Override
@@ -355,22 +395,69 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             // TODO: attempt authentication against a network service.
 
             try {
-                // Simulate network access.
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                Certificate ca = cf.generateCertificate(mIn);
+
+                KeyStore trusted = KeyStore.getInstance(KeyStore.getDefaultType());
+                trusted.load(null, null);
+                trusted.setCertificateEntry("ca", ca);
+                TrustManagerFactory trustFac = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustFac.init(trusted);
+
+                SSLContext logContext = SSLContext.getInstance("TLSv1.2");
+                logContext.init(null, trustFac.getTrustManagers(), null);
+
+                String httpsURL = "https://24.22.232.72:8443/Login/RBFLogin";
+                URL loginURL = new URL(httpsURL);
+                HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
+                logCon.connect();
+                logCon.setSSLSocketFactory(logContext.getSocketFactory());
+                int responseCode = logCon.getResponseCode();
+                if(responseCode == 200);
+
+                OutputStream ostream = logCon.getOutputStream();
+                OutputStreamWriter owriter = new OutputStreamWriter(ostream);
+                JsonWriter jwriter = new JsonWriter(owriter);
+                jwriter.beginObject();
+                jwriter.name("task").value("Login");
+                jwriter.name("user").value(mEmail);
+                jwriter.name("password").value(mPassword);
+                jwriter.endObject();
+                jwriter.flush();
+
                 Thread.sleep(2000);
+                String name = "";
+                boolean authorized = false;
+
+                InputStream istream = logCon.getInputStream();
+                InputStreamReader ireader = new InputStreamReader(istream);
+                JsonReader jreader = new JsonReader(ireader);
+                jreader.beginObject();
+                if(jreader.hasNext()){
+                    name = jreader.nextName();
+                    if(name.equals("auth")) authorized = jreader.nextBoolean();
+                }
+                jreader.endObject();
+                return authorized;
+
             } catch (InterruptedException e) {
                 return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d("my super tag", "UserLoginTask", e);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
             }
 
             // TODO: register the new account here.
-            return true;
+            return false;
         }
 
         @Override
