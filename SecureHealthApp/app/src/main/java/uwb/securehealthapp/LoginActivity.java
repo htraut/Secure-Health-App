@@ -407,7 +407,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 SSLContext logContext = SSLContext.getInstance("TLSv1.2");
                 logContext.init(null, trustFac.getTrustManagers(), null);
 
-                String httpsURL = "https://24.22.232.72:8443/Login/RBFLogin";
+                String httpsURL = "https://50.135.162.16";
                 URL loginURL = new URL(httpsURL);
                 HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
                 logCon.connect();
