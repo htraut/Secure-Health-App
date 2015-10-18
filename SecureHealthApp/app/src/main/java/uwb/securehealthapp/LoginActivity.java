@@ -33,8 +33,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,8 +46,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -100,7 +105,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Find the Google+ sign in button.
+       /* // Find the Google+ sign in button.
         mPlusSignInButton = (SignInButton) findViewById(R.id.plus_sign_in_button);
         if (supportsGooglePlayServices()) {
             // Set a listener to connect the user when the G+ button is clicked.
@@ -116,7 +121,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             mPlusSignInButton.setVisibility(View.GONE);
             return;
         }
-
+        */
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -201,7 +206,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             InputStream is = null;
             try {
                 //is = new BufferedInputStream(new FileInputStream("tomcat.crt"));
-                is = this.getResources().openRawResource(R.raw.tomcat);
+                is = this.getResources().openRawResource(R.raw.rbfsecurehealth);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -289,7 +294,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         boolean connected = getGoogleApiClient().isConnected();
 
         mSignOutButtons.setVisibility(connected ? View.VISIBLE : View.GONE);
-        mPlusSignInButton.setVisibility(connected ? View.GONE : View.VISIBLE);
+//        mPlusSignInButton.setVisibility(connected ? View.GONE : View.VISIBLE);
         mEmailLoginFormView.setVisibility(connected ? View.GONE : View.VISIBLE);
     }
 
@@ -406,14 +411,14 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
 
                 SSLContext logContext = SSLContext.getInstance("TLSv1.2");
                 logContext.init(null, trustFac.getTrustManagers(), null);
-
-                String httpsURL = "https://50.135.162.16";
+                String httpsURL = "https://www.rbfsecurehealth.com";
                 URL loginURL = new URL(httpsURL);
                 HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
                 logCon.connect();
                 logCon.setSSLSocketFactory(logContext.getSocketFactory());
-                int responseCode = logCon.getResponseCode();
-                if(responseCode == 200);
+                logCon.setRequestMethod("POST");
+                logCon.setRequestProperty("Content Type", "application/json; charset=UTF-8");
+                logCon.setDoOutput(true);
 
                 OutputStream ostream = logCon.getOutputStream();
                 OutputStreamWriter owriter = new OutputStreamWriter(ostream);
@@ -438,6 +443,8 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                     if(name.equals("auth")) authorized = jreader.nextBoolean();
                 }
                 jreader.endObject();
+                int responseCode = logCon.getResponseCode();
+                if(responseCode == 200);
                 return authorized;
 
             } catch (InterruptedException e) {
@@ -481,4 +488,3 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         }
     }
 }
-
