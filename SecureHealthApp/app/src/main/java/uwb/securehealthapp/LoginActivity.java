@@ -28,6 +28,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -53,6 +54,7 @@ import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
@@ -174,7 +176,19 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-
+        String hashEmail = getSha256(email);
+        String hashPass = getSha256(password);
+/*
+        if( (email != null && email.equals("") ) || (password !=null && password.equals("")))
+        {
+            hashEmail = getSha256(email);
+            hashPass = getSha256(password);
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "Enter your credentials..", Toast.LENGTH_LONG).show();
+        }
+*/
         boolean cancel = false;
         View focusView = null;
 
@@ -484,6 +498,18 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    public static String getSha256(String value) {
+        try{
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(value.getBytes());
+            byte[] digest = md.digest();
+            return String.format("%064x", new java.math.BigInteger(1, digest));
+
+        } catch(Exception ex){
+            throw new RuntimeException(ex);
         }
     }
 }
