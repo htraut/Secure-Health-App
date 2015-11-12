@@ -34,6 +34,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -226,7 +227,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 e.printStackTrace();
             }
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password, is);
+            mAuthTask = new UserLoginTask(hashEmail, hashPass, is);
             mAuthTask.execute((Void) null);
         }
     }
@@ -429,9 +430,11 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 URL loginURL = new URL(httpsURL);
                 HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
                 logCon.setSSLSocketFactory(logContext.getSocketFactory());
-                logCon.setRequestMethod("POST");
-                logCon.setRequestProperty("Content Type", "application/json; charset=UTF-8");
+                logCon.setDoInput(true);
                 logCon.setDoOutput(true);
+                logCon.setRequestProperty("Content Type", "application/json;charset=utf-8");
+                logCon.setRequestMethod("POST");
+                logCon.setUseCaches(false);
 
                 OutputStream ostream = logCon.getOutputStream();
                 OutputStreamWriter owriter = new OutputStreamWriter(ostream);
@@ -451,6 +454,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 InputStreamReader ireader = new InputStreamReader(istream);
                 JsonReader jreader = new JsonReader(ireader);
                 jreader.beginObject();
+                jreader.setLenient(true);
                 if(jreader.hasNext()){
                     name = jreader.nextName();
                     if(name.equals("auth")) authorized = jreader.nextBoolean();
