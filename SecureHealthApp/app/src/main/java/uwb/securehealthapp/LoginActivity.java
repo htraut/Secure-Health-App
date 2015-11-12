@@ -414,7 +414,6 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 String httpsURL = "https://www.rbfsecurehealth.com";
                 URL loginURL = new URL(httpsURL);
                 HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
-                logCon.connect();
                 logCon.setSSLSocketFactory(logContext.getSocketFactory());
                 logCon.setRequestMethod("POST");
                 logCon.setRequestProperty("Content Type", "application/json; charset=UTF-8");
