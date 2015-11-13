@@ -430,11 +430,12 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 URL loginURL = new URL(httpsURL);
                 HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
                 logCon.setSSLSocketFactory(logContext.getSocketFactory());
+                logCon.setRequestMethod("POST");
                 logCon.setDoInput(true);
                 logCon.setDoOutput(true);
-                logCon.setRequestProperty("Content Type", "application/json;charset=utf-8");
-                logCon.setRequestMethod("POST");
-                logCon.setUseCaches(false);
+                logCon.setRequestProperty("Content-Type", "application/json");
+                //int responseCode = logCon.getResponseCode();
+                //if(responseCode != logCon.HTTP_OK) return false;
 
                 OutputStream ostream = logCon.getOutputStream();
                 OutputStreamWriter owriter = new OutputStreamWriter(ostream);
@@ -450,18 +451,16 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 String name = "";
                 boolean authorized = false;
 
+
                 InputStream istream = logCon.getInputStream();
                 InputStreamReader ireader = new InputStreamReader(istream);
                 JsonReader jreader = new JsonReader(ireader);
                 jreader.beginObject();
-                jreader.setLenient(true);
                 if(jreader.hasNext()){
                     name = jreader.nextName();
                     if(name.equals("auth")) authorized = jreader.nextBoolean();
                 }
                 jreader.endObject();
-                int responseCode = logCon.getResponseCode();
-                if(responseCode == 200);
                 return authorized;
 
             } catch (InterruptedException e) {
