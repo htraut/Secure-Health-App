@@ -220,8 +220,8 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             // perform the user login attempt.
             InputStream is = null;
             try {
-                //is = new BufferedInputStream(new FileInputStream("tomcat.crt"));
-                is = this.getResources().openRawResource(R.raw.rbfsecurehealth);
+                //is = new BufferedInputStream(new FileInputStream("example.crt"));
+                is = new BufferedInputStream(new FileInputStream("rbfsecurehealth.com.crt"));
 
             } catch (Exception e) {
                 e.printStackTrace();

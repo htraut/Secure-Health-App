@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "secure-health-app-css-497",
+    "project_number": "319705479317",
+    "name": "Secure Health App CSS 497"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319705479317:android:8d7e23799f0cf12e",
+        "client_id": "android:uwb.securehealthapp",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "uwb.securehealthapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "319705479317-ufgul341v0cd56gfun1c76ntm32i6fkl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uwb.securehealthapp",
+            "certificate_hash": "A6B40586176D21ED56921392B2352D7A29AF9E71"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
