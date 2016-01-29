@@ -71,6 +71,12 @@
         </activity>
 
         <activity
+            android:name=".MessagingList"
+            android:label="@string/MessageList"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+        </activity>
+
+        <activity
             android:name=".MessagingActivity"
             android:label="@string/Message"
             android:windowSoftInputMode="adjustResize|stateHidden" >

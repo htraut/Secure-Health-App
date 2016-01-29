@@ -64,7 +64,7 @@ public class HomeActivity extends Activity {
         if(act == null) return 1;
         switch(act){
             case "messaging":
-                intent = new Intent(HomeActivity.this, MessagingActivity.class);
+                intent = new Intent(HomeActivity.this, MessagingList.class);
                 startActivity(intent);
                 break;
             case "medical records":

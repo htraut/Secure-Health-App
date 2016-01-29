@@ -28,37 +28,23 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -66,9 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 
@@ -221,10 +205,10 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             InputStream is = null;
             try {
                 //is = new BufferedInputStream(new FileInputStream("example.crt"));
-                is = new BufferedInputStream(new FileInputStream("rbfsecurehealth.com.crt"));
+                is = this.getResources().openRawResource(R.raw.rbfsecurehealthcom);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d("myCert", "UserLoginTask", e);
             }
             showProgress(true);
             mAuthTask = new UserLoginTask(hashEmail, hashPass, is);
@@ -447,7 +431,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 jwriter.endObject();
                 jwriter.flush();
 
-                Thread.sleep(2000);
+                Thread.sleep(1000);
                 String name = "";
                 boolean authorized = false;
 
