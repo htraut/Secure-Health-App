@@ -108,17 +108,24 @@ public class MessagingActivity extends Activity {
         private final String messageSub;
         private final String messageBody;
         private final TrustManagerFactory tmf;
+        private Speck spk;
 
         SendMessageTask(String email, String subject, String body, TrustManagerFactory Mytmf){
             messageEmail = email;
             messageSub = subject;
             messageBody = body;
             tmf = Mytmf;
+            spk = new Speck(32);
         }
 
         protected Boolean doInBackground(Void... params){
 
             try {
+                String checksum = spk.SHA256(messageEmail+messageSub+messageBody);
+                int[] encryptEmail = spk.encrypt(messageEmail);
+                int[] encryptSub = spk.encrypt(messageSub);
+                int[] encryptBody = spk.encrypt(messageBody);
+
                 SSLContext logContext = SSLContext.getInstance("TLSv1.2");
                 logContext.init(null, tmf.getTrustManagers(), null);
                 String httpsURL = "https://www.rbfsecurehealth.com";
@@ -135,9 +142,10 @@ public class MessagingActivity extends Activity {
                 JsonWriter jwriter = new JsonWriter(owriter);
                 jwriter.beginObject();
                 jwriter.name("task").value("Message");
-                jwriter.name("email").value(messageEmail);
-                jwriter.name("subject").value(messageSub);
-                jwriter.name("body").value(messageBody);
+                jwriter.name("email").value(String.valueOf(encryptEmail));
+                jwriter.name("subject").value(String.valueOf(encryptSub));
+                jwriter.name("body").value(String.valueOf(encryptBody));
+                jwriter.name("checksum").value(checksum);
                 jwriter.endObject();
                 jwriter.flush();
 
