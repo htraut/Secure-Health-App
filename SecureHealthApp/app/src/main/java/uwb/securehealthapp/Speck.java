@@ -1,6 +1,9 @@
 package uwb.securehealthapp;
 
+import java.lang.reflect.Array;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Objects;
 
 /**
@@ -37,13 +40,13 @@ public class Speck {
         *  2 or 3 or 4 if n = 64
         */
 
-        switch(n){
+        switch (n){
             case 16:
-                m = 4;
-                break;
+               m = 4;
+               break;
             case 24:
-                m = 4;
-                break;
+               m = 4;
+               break;
             case 32:
                 m = 4;
                 break;
@@ -113,37 +116,37 @@ public class Speck {
         }
     }
 
-    public int[] encrypt(String value){
+    public ArrayList<Integer> encrypt(String value){
         //Quick fix for strings with odd lengths
         if((value.length()%2) != 0){
             value += " ";
         }
-        int[] retVal = new int[value.length()];
+        ArrayList<Integer> retVal= new ArrayList<Integer>();
 
         for(int i = 0; i < value.length(); i+=2){
             int x = value.charAt(i);
-            int y = value.charAt(i+1);
+            int y = value.charAt(i + 1);
 
             _keyExpansion();
             int[] temp =  _encrypt(x, y);
-            retVal[i] = temp[0];
-            retVal[i+1] = temp[1];
+            retVal.add(temp[0]);
+            retVal.add(temp[1]);
         }
 
         return retVal;
     }
 
-    public int[] decrypt(String value){
-        int[] retVal = new int[value.length()];
+    public ArrayList<Integer> decrypt(int value[]){
+        ArrayList<Integer> retVal = new ArrayList<Integer>();
 
-        for(int i = 0; i < value.length(); i+=2){
-            int x = value.charAt(i);
-            int y = value.charAt(i+1);
+        for(int i = 0; i < value.length; i+=2){
+            int x = value[i];
+            int y = value[i+1];
 
             _keyExpansion();
             int[] temp =  _decrypt(x, y);
-            retVal[i] = temp[0];
-            retVal[i+1] = temp[1];
+            retVal.add(temp[0]);
+            retVal.add(temp[1]);
         }
 
         return retVal;

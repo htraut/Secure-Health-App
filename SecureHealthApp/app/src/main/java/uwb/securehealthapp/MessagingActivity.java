@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -122,13 +123,14 @@ public class MessagingActivity extends Activity {
 
             try {
                 String checksum = spk.SHA256(messageEmail+messageSub+messageBody);
-                int[] encryptEmail = spk.encrypt(messageEmail);
-                int[] encryptSub = spk.encrypt(messageSub);
-                int[] encryptBody = spk.encrypt(messageBody);
+                ArrayList<Integer> encryptEmail = spk.encrypt(messageEmail);
+                ArrayList<Integer> encryptSub = spk.encrypt(messageSub);
+                ArrayList<Integer> encryptBody = spk.encrypt(messageBody);
+
 
                 SSLContext logContext = SSLContext.getInstance("TLSv1.2");
                 logContext.init(null, tmf.getTrustManagers(), null);
-                String httpsURL = "https://www.rbfsecurehealth.com";
+                String httpsURL = "https://www.rbfsecurehealth.com/api/message";
                 URL loginURL = new URL(httpsURL);
                 HttpsURLConnection logCon = (HttpsURLConnection) loginURL.openConnection();
                 logCon.setSSLSocketFactory(logContext.getSocketFactory());
@@ -142,9 +144,9 @@ public class MessagingActivity extends Activity {
                 JsonWriter jwriter = new JsonWriter(owriter);
                 jwriter.beginObject();
                 jwriter.name("task").value("Message");
-                jwriter.name("email").value(String.valueOf(encryptEmail));
-                jwriter.name("subject").value(String.valueOf(encryptSub));
-                jwriter.name("body").value(String.valueOf(encryptBody));
+                jwriter.name("email").value(encryptEmail.toString());
+                jwriter.name("subject").value(encryptSub.toString());
+                jwriter.name("body").value(encryptBody.toString());
                 jwriter.name("checksum").value(checksum);
                 jwriter.endObject();
                 jwriter.flush();
@@ -153,18 +155,18 @@ public class MessagingActivity extends Activity {
 
 
                 String name = "";
-                boolean auth = false;
+                boolean received = false;
                 InputStream istream = logCon.getInputStream();
                 InputStreamReader ireader = new InputStreamReader(istream);
                 JsonReader jreader = new JsonReader(ireader);
                 jreader.beginObject();
                 if(jreader.hasNext()){
                     name = jreader.nextName();
-                    if(name.equals("auth")) auth = jreader.nextBoolean();
+                    if(name.equals("status")) received = jreader.nextBoolean();
                 }
                 jreader.endObject();
 
-                return true;
+                return received;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
